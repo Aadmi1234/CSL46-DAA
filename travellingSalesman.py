@@ -55,8 +55,7 @@ def TSPRec(adj, curr_bound, curr_weight,
 			
 			# curr_res has the total weight
 			# of the solution we got
-			curr_res = curr_weight + adj[curr_path[level - 1]]\
-										[curr_path[0]]
+			curr_res = curr_weight + adj[curr_path[level - 1]][curr_path[0]]
 			if curr_res < final_res:
 				copyToFinal(curr_path)
 				final_res = curr_res
@@ -103,8 +102,7 @@ def TSPRec(adj, curr_bound, curr_weight,
 			# Also reset the visited array
 			visited = [False] * len(visited)
 			for j in range(level):
-				if curr_path[j] != -1:
-					visited[curr_path[j]] = True
+				visited[curr_path[j]] = True
 
 # This function sets up final_path
 def TSP(adj):

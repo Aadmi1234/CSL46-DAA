@@ -1,0 +1,375 @@
+======================= Insertion Sort =========================
+def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]  # Current element to be inserted
+        j = i - 1  # Index of the previous element
+
+        # Move elements of arr[0...i-1] that are greater than the key to one position ahead
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+
+        arr[j + 1] = key  # Place the key at its correct position in the sorted subarray
+
+# Driver Code
+array=[]
+n=int(input("Enter the no of elements: "))
+print("Enter the elements: ")
+for i in range(n):
+    array.append(int(input()))
+
+insertion_sort(array)
+print("The array after sorting:")
+print(array)
+
+
+"""
+----------------------------------------------------------------------------------------------------
+Output:
+
+Enter the no of elements: 5
+Enter the elements: 
+3
+5
+63
+2
+43
+The array after sorting:
+[2, 3, 5, 43, 63]
+----------------------------------------------------------------------------------------------------
+
+APPLICATIONS of Insertion Sort:
+
+Small Input Sizes: Insertion Sort performs efficiently on small input sizes or partially sorted arrays where the number of elements is relatively small. Its simplicity and ease of implementation make it suitable for such cases.
+
+Partially Sorted Arrays: If an array is partially sorted or has a small number of elements out of order, Insertion Sort can efficiently sort it. In such cases, the number of comparisons and shifts required is relatively small, resulting in a faster sorting process compared to other algorithms.
+
+Online Sorting: Insertion Sort is well-suited for online sorting scenarios where new elements are continuously added to the existing sorted list. It can efficiently insert the new elements at their appropriate positions, maintaining the sorted order.
+
+----------------------------------------------------------------------------------------------------
+
+TIME COMPLEXITY of Insertion Sort:
+The time complexity of Insertion Sort is O(n^2) in the worst case and average case, where n is the number of elements in the array. 
+However, in the best case scenario, when the array is already sorted, the time complexity reduces to O(n). 
+"""
+
+
+======================= DFS =========================
+# Using a Python dictionary to act as an adjacency list
+graph = {
+    '0': ['1', '2','3'],
+    '1': ['0', '2', '4'],
+    '2': ['0','1','4'],
+    '3': ['4','0'],
+    '4': ['1','2', '3'],
+}
+
+visited = set()  # Set to keep track of visited nodes.
+
+
+def dfs(visited, graph, node):
+    if node not in visited:  # If the node has not been visited
+        print(node, end=' ')  # Print the node
+        visited.add(node)  # Mark the node as visited
+        for child in graph[node]:  # Explore each child of the node
+            dfs(visited, graph, child)  # Recursive call to explore child nodes
+
+
+# Driver Code
+print("DFS traversal : ", end= ' ')
+dfs(visited, graph, '0')  # Start the DFS traversal from node '0'
+
+
+"""
+----------------------------------------------------------------------------------------------------
+Output:-
+DFS traversal :  0 1 2 4 3 
+----------------------------------------------------------------------------------------------------
+Time complexity:
+The time complexity of this algorithm depends on the number of vertices (V) and edges (E) in the graph.
+In the worst case, each node and edge will be visited exactly once.
+Therefore, the time complexity can be approximated as O(2V + E), which simplifies to O(V + E).
+
+Space complexity:
+The space complexity is determined by the size of the visited set, which can contain at most all the vertices.
+Therefore, the space complexity is O(V), where V is the number of vertices in the graph.
+
+Applications:
+----------------------------------------------------------------------------------------------------
+Finding a path through a maze.
+Detecting and exploring connected components in a social network.
+Checking for the existence of a cycle in a graph.
+Parsing and evaluating mathematical expressions.
+Solving puzzles like Sudoku or the Eight Queens problem.
+"""
+
+
+======================= Counting Inversions =========================
+def merge(lst, low, mid, high):
+    i = low
+    j = mid+1
+    k = 0
+    invCount = 0
+    temp = [0 for x in range(high-low+1)]
+    # Merge two sorted subarrays into a temporary array
+    while i <= mid and j <= high:
+        if lst[i] <= lst[j]:
+            temp[k] = lst[i]
+            k += 1
+            i += 1
+        else:
+            temp[k] = lst[j]
+            invCount += (mid-i+1)  # Update inversion count
+            j += 1
+            k += 1
+
+    # Copy the remaining elements from the first subarray, if any
+    while i <= mid:
+        temp[k] = lst[i]
+        i += 1
+        k += 1
+
+    # Copy the remaining elements from the second subarray, if any
+    while j <= high:
+        temp[k] = lst[j]
+        j += 1
+        k += 1
+
+    # Copy the sorted elements from the temporary array back to the original list
+    for i in range(low, high+1):
+        lst[i] = temp[i-low]
+
+    return invCount
+
+
+def mergeSort(lst, low, high):
+    invCount = 0
+    # Base case: If the list has more than one element
+    if low < high:
+        mid = (low + high) // 2
+        # Recursively sort the two halves and count inversions
+        invCount += mergeSort(lst, low, mid)
+        invCount += mergeSort(lst, mid+1, high)
+        invCount += merge(lst, low, mid, high)
+    return invCount
+
+
+lst = [1, 2, 6, 4, 5 , 8, 7, 3]
+b = mergeSort(lst, 0, len(lst)-1)
+print("Number of inversions:", b)
+
+"""
+----------------------------------------------------------------------------------------------------
+Output:-
+Number of inversions: 8
+----------------------------------------------------------------------------------------------------
+Tc : O(nlogn)
+SC : O(n) , # for the temp array we are using
+
+----------------------------------------------------------------------------------------------------
+Real life applications:
+1)Financial Data Analysis: Counting inversions can be useful in financial data analysis, such as detecting anomalous or irregular patterns in stock market trades or financial transactions.
+2)Collaborative Filtering: In recommender systems, counting inversions can help identify similar user preferences or item rankings, allowing for more accurate recommendations.
+3)Genome Analysis: In bioinformatics, counting inversions can provide insights into the evolutionary history of species by comparing genetic sequences.
+4)Image Processing: In image analysis, counting inversions can be used for feature extraction or pattern recognition tasks, such as identifying objects with certain color or intensity variations.
+5)Optimization Problems: Counting inversions can be utilized as a measure of distance or dissimilarity between solutions in optimization problems, allowing for the exploration of different search spaces.
+----------------------------------------------------------------------------------------------------
+"""
+
+
+======================= Quick Sort =========================
+def partition(a,low,high):
+    
+    """
+    Rearranges the array such that all elements smaller than the pivot are on the left
+    and all elements greater than the pivot are on the right.
+    """
+    
+    pivot=a[low]
+    p=low+1  #pointer for elements < pivot (left subarray)
+    q=high   #pointer for elements > pivot (right subarray)
+    while True:
+        while p<=q and a[p]<=pivot:
+            p+=1                     # pointer p is incremented as long as the element<pivot
+        while p<=q and a[q]>pivot:
+            q-=1                     # pointer q is decremented as long as the element>pivot
+            
+        if p<=q:                     # now p points to an element>pivot and q points to an element < pivot
+            a[p],a[q]=a[q],a[p]      # the positions of these elements are swapped
+        else:
+            break
+    a[low],a[q]=a[q],a[low]          # the pivot element is placed in its correct position
+    return q
+
+def quicksort(a,low,high):
+    if(low<high):
+        pivot=partition(a,low,high)   # Partition the array
+        quicksort(a,low,pivot-1)      # Recursively sort the left subarray
+        quicksort(a,pivot+1,high)     # Recursively sort the right subarray
+
+
+# Driver Code
+array=[]
+n=int(input("Enter the no of elements: "))
+print("Enter the elements: ")
+for i in range(n):
+    array.append(int(input()))
+low=0
+high=n-1
+quicksort(array,low,high)
+print("The array after sorting:")
+print(array)
+
+"""
+----------------------------------------------------------------------------------------------------
+Output:-
+
+Enter the no of elements: 5
+Enter the elements: 
+2
+32
+1
+3
+5
+The array after sorting:
+[1, 2, 3, 5, 32]
+
+----------------------------------------------------------------------------------------------------
+APPLICATIONS of Quicksort:
+
+General Sorting: Quicksort is widely used for sorting arrays or lists of elements in various programming languages and libraries due to its efficiency and simplicity.
+
+Large Datasets: Quicksort performs well on large datasets, making it a popular choice for sorting large volumes of data efficiently.
+
+In-Place Sorting: Quicksort operates on the input array itself, requiring only a small amount of additional memory for recursive calls. This makes it desirable in scenarios with limited memory availability.
+
+Unstable Sorting: Quicksort is an unstable sorting algorithm, meaning it does not guarantee the relative order of equal elements after sorting. This property can be beneficial in certain applications where the original order of equal elements is not significant.
+
+----------------------------------------------------------------------------------------------------
+TIME COMPLEXITY of Quicksort:
+
+The time complexity of Quicksort depends on the choice of the pivot and the partitioning strategy. In the average and best cases, Quicksort has a time complexity of O(n log n), where n is the number of elements in the array.
+
+In the worst case, when the pivot is consistently chosen as the smallest or largest element, Quicksort can have a time complexity of O(n^2).
+----------------------------------------------------------------------------------------------------
+"""
+
+
+======================= Prims =========================
+def prim(graph):
+    VT = set([1]) # Initialize the set of tree vertices with any vertex, here 1
+    ET = [] # Initialize the set of edges composing the minimum spanning tree
+    while len(VT) < len(graph):
+        min_weight = float('inf')
+        min_edge = None
+        for v in VT:
+            for u, weight in graph[v]:
+                if u not in VT and weight < min_weight:
+                    min_weight = weight
+                    min_edge = (v, u)
+        VT.add(min_edge[1])
+        ET.append(min_edge)
+    return ET
+
+graph = {
+ 1: [(2, 4), (4, 8)],
+ 2: [(1, 4), (3, 3), (4, 1)],
+ 3: [(2, 3), (4, 7), (6, 8)],
+ 4: [(1, 8), (6, 3), (3, 7), (2, 1)],
+ 6: [(4, 3), (3, 8)]
+}
+
+# Call the prim function
+minimum_spanning_tree = prim(graph)
+# Print the minimum spanning tree
+print("Minimum Spanning Tree:")
+for edge in minimum_spanning_tree:
+    print(f"{edge[0]} - {edge[1]}")
+
+#In the function prim we first initialize the vertex set to any vertex ,here we are starting with vertex 1.
+#We initialize the edge set(of spanning tree) to empty
+#We run a while loop for the condition length of vertex set is less than length of graph dictionary
+#Set minimum weight to infinity and minimum edge to none
+#We run a for loop for all vertex v in vertex set and run another for loop for the adjacent vertex, weight of the edge in the graph
+#if the adjacent vertex is nt there in the vertex set and weight of the edge is less than minimum weight than we update the min weight and min_edge
+#The loop iterates until we have all the vertices and have the best min weights
+#then we add these edges to edge set of spanning tree and print them
+
+"""
+----------------------------------------------------------------------------------------------------
+Output:-
+
+Minimum Spanning Tree:
+1 - 2
+2 - 4
+2 - 3
+4 - 6
+----------------------------------------------------------------------------------------------------
+Application:
+
+DNA Sequencing: In bioinformatics, Prim's algorithm can be employed in DNA sequencing to identify the minimum set of DNA fragments required to reconstruct a full genome. By treating DNA fragments as nodes and their overlaps as weights, Prim's algorithm can help in assembling DNA sequences accurately.
+
+Network Design: Prim's algorithm can be used in network design and infrastructure planning. It helps identify the most efficient and cost-effective way to connect multiple nodes in a network while ensuring connectivity and minimizing the total cost of the network.
+----------------------------------------------------------------------------------------------------
+Time complexity: O(E log|V| )
+"""
+
+
+======================= Subset Sum =========================
+
+# sum problem Returns true if there is a subset of
+# set[] with sun equal to given sum
+
+
+# Returns true if there is a subset of set[]
+# with sum equal to given sum
+def isSubsetSum(set, n, sum):
+
+	# The value of subset[i][j] will be
+	# true if there is a
+	# subset of set[0..j-1] with sum equal to i
+	subset = ([[False for i in range(sum + 1)]
+			for i in range(n + 1)])
+
+	# If sum is 0, then answer is true
+	for i in range(n + 1):
+		subset[i][0] = True
+
+	# If sum is not 0 and set is empty,
+	# then answer is false
+	for i in range(1, sum + 1):
+		subset[0][i] = False
+
+	# Fill the subset table in bottom up manner
+	for i in range(1, n + 1):
+		for j in range(1, sum + 1):
+			if j < set[i-1]:
+				subset[i][j] = subset[i-1][j]
+			if j >= set[i-1]:
+				subset[i][j] = (subset[i-1][j] or
+								subset[i - 1][j-set[i-1]])
+
+	return subset[n][sum]
+
+
+# Driver code
+if __name__ == '__main__':
+	set = [3, 34, 4, 12, 5, 2]
+	sum = 9
+	n = len(set)
+	if (isSubsetSum(set, n, sum) == True):
+		print("Found a subset with given sum")
+	else:
+		print("No subset with given sum")
+
+
+"""
+Output :-
+Found a subset with given sum
+----------------------------------------------------------------------------------------------------
+Real-life applications:
+There are security problems other than public-key codes for which subset-sum problems are useful. A computer needs to verify a user's identity before allowing him or her access to an account.
+----------------------------------------------------------------------------------------------------
+Time Complexity: O(sum * n)
+"""
+

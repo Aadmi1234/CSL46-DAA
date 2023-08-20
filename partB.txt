@@ -1,0 +1,873 @@
+=======================Gale Shapley=========================
+
+def w_prefers_m_over_m1(prefer, w, m, m1):
+	for i in range(N):
+		if (prefer[w][i] == m1):
+			return True
+		if (prefer[w][i] == m):
+			return False
+
+
+def stableMarriage(prefer):
+	
+    married = [False for _ in range(N)]
+    pairingW = [-1 for _ in range(N)]
+
+    freecount = N
+
+    while freecount > 0:
+        m = 0
+
+        while m < N:
+            if (married[m] == False):
+                break
+            m += 1
+
+        i = 0
+        while i < N and married[m] == False :
+            w = prefer[m][i]
+
+            # if woman is free 
+            if pairingW[w - N] == -1 :
+                pairingW[w - N] = m
+                married[m] = True
+                freecount -= 1
+
+            # if woman is already married to some m1
+            else :
+                m1 = pairingW[w - N]
+
+                if w_prefers_m_over_m1(prefer, w, m, m1) == True :
+                    pairingW[w - N] = m
+                    married[m] = True
+                    married[m1] = False
+                    
+            i += 1
+
+    return pairingW
+
+
+A = 0
+B = 1
+C = 2
+V = 3
+W = 4
+X = 5
+
+
+prefer = [[V,W,X], [W,V,X],
+		[V,W,X], [A,B,C],
+		[B,C,A], [C,A,B]]
+
+N = 3
+wPartner = stableMarriage(prefer)
+
+name = {
+        0 : 'A',
+        1 : 'B', 
+        2 : 'C',
+        3 : 'V',
+        4 : 'W',
+        5 : 'X'
+    }
+
+print("Woman ", " Man")
+for i in range(N):
+	print(name[i + N], "\t", name[wPartner[i]])
+
+"""
+-----------------------------------
+Output:-
+
+Woman   Man
+V 	 C
+W 	 A
+X 	 B
+
+-----------------------------------
+TIME COMPLEXITY: O(N^2)
+-----------------------------------
+
+APPLICATIONS:
+stable marriage, employer-employee  
+
+------------------------------------
+"""
+
+
+=======================Merge Sort=========================
+
+def merge(lst, low, mid, high):
+    i = low
+    j = mid+1
+    k = 0
+    temp = [0 for x in range(high-low+1)]
+    # Merge two sorted subarrays into a temporary array
+    while i <= mid and j <= high:
+        if lst[i] <= lst[j]:
+            temp[k] = lst[i]
+            k += 1
+            i += 1
+        else:
+            temp[k] = lst[j]
+            j += 1
+            k += 1
+
+    # Copy the remaining elements from the first subarray, if any
+    while i <= mid:
+        temp[k] = lst[i]
+        i += 1
+        k += 1
+
+    # Copy the remaining elements from the second subarray, if any
+    while j <= high:
+        temp[k] = lst[j]
+        j += 1
+        k += 1
+
+    # Copy the sorted elements from the temporary array back to the original list
+    for i in range(low, high+1):
+        lst[i] = temp[i-low]
+
+def mergeSort(lst, low, high):
+    # Base case: If the list has more than one element
+    if low < high:
+        mid = (low + high) // 2
+        # Recursively sort the two halves
+        mergeSort(lst, low, mid)
+        mergeSort(lst, mid+1, high)
+        merge(lst, low, mid, high)
+
+if __name__ == "__main__":
+    lst = [1, 2, 6, 4, 5 , 8, 7, 3]
+
+    print("Unsorted list : ")
+    print(lst)
+
+    b = mergeSort(lst, 0, len(lst)-1)
+
+    print("Sorted list : ")
+    print(lst)
+
+
+"""
+Output:
+Unsorted list : 
+[1, 2, 6, 4, 5, 8, 7, 3]
+Sorted list : 
+[1, 2, 3, 4, 5, 6, 7, 8]
+"""
+
+"""
+Tc : O(nlogn)
+SC : O(n)  # for the temp array we are using
+"""
+
+
+=======================Dijkstra=========================
+
+class Graph():
+
+	def __init__(self, vertices):
+		self.V = vertices
+		self.graph = [[0 for column in range(vertices)]
+					for row in range(vertices)]
+
+	def printSolution(self, dist):
+		print("Vertex \t Distance from Source")
+		for node in range(self.V):
+			print(node+1, "\t\t", dist[node])
+
+	# A utility function to find the vertex with
+	# minimum distance value, from the set of vertices
+	# not yet included in shortest path tree
+	def minDistance(self, dist, sptSet):
+
+		# Initialize minimum distance for next node
+		min = 1e7
+
+		# Search nearest vertex not in the shortest path tree
+		for v in range(self.V):
+			if dist[v] < min and sptSet[v] == False:
+				min = dist[v]
+				min_index = v
+
+		return min_index
+
+	# Function that implements Dijkstra's single source
+	# shortest path algorithm for a graph represented
+	# using adjacency matrix representation
+	def dijkstra(self, src):
+
+		dist = [1e7] * self.V
+		dist[src] = 0
+		sptSet = [False] * self.V
+
+		for cout in range(self.V):
+
+			# Pick the minimum distance vertex from
+			# the set of vertices not yet processed.
+			# u is always equal to src in first iteration
+			u = self.minDistance(dist, sptSet)
+
+			# Put the minimum distance vertex in the
+			# shortest path tree
+			sptSet[u] = True
+
+			# Update dist value of the adjacent vertices
+			# of the picked vertex only if the current
+			# distance is greater than new distance and
+			# the vertex in not in the shortest path tree
+			for v in range(self.V):
+				if (self.graph[u][v] > 0 and
+				sptSet[v] == False and
+				dist[v] > dist[u] + self.graph[u][v]):
+					dist[v] = dist[u] + self.graph[u][v]
+
+		self.printSolution(dist)
+
+# Driver program
+g = Graph(5)
+g.graph = [[0,10,0,0,100],
+		   [10,0,50,0,0],
+		   [0,50,0,20,10],
+		   [0,0,20,0,60],
+		   [100,0,10,60,0]
+		]
+
+g.dijkstra(0)
+
+"""
+------------------------------------
+Output:
+Vertex 	 Distance from Source
+1 		 0
+2 		 10
+3 		 60
+4 		 80
+5 		 70
+------------------------------------
+TIME COMPLEXITY:
+has a time complexity of O(V^2) using the adjacency matrix representation of graph. The time complexity can be reduced to O((V+E)logV) using adjacency list representation of graph, where E is the number of edges in the graph and V is the number of vertices in the graph.
+-------------------------
+APPLICATION:
+1. Digital Mapping Services in Google Maps
+2. Social Networking Applications
+3. Telephone Network
+_________________________________________________________________________________
+"""
+
+
+======================= Kruskal =========================
+
+def find(parent, vertex):
+    # Find the root of the disjoint set to which the vertex belongs.
+    if parent[vertex] == vertex:
+        return vertex
+    parent[vertex] = find(parent, parent[vertex])
+    return parent[vertex]
+
+def union(parent, rank, x, y):
+    # Perform the union operation of the disjoint sets.
+    root_x = find(parent, x)
+    root_y = find(parent, y)
+
+    if rank[root_x] < rank[root_y]:
+        parent[root_x] = root_y
+    elif rank[root_x] > rank[root_y]:
+        parent[root_y] = root_x
+    else:
+        parent[root_y] = root_x
+        rank[root_x] += 1
+
+def kruskal(graph):
+    """
+    Find the minimum spanning tree (MST) of a weighted undirected graph using Kruskal's algorithm.
+    """
+    edges = []  # List to store all edges
+    mst = []    # Minimum spanning tree
+
+    # Create a disjoint set for each vertex
+    parent = {vertex: vertex for vertex in graph}
+    rank = {vertex: 0 for vertex in graph}
+    
+    
+
+    # Create a list of all edges in the graph
+    for u in graph:
+        for v, weight in graph[u]:
+            edges.append((u, v, weight))
+
+    # Sort the edges in ascending order of their weights
+    edges.sort(key=lambda x: x[2])
+
+    for u, v, weight in edges:
+        root_u = find(parent, u)
+        root_v = find(parent, v)
+
+        # If including the edge does not form a cycle, add it to the MST
+        if root_u != root_v:
+            mst.append((u, v, weight))
+            union(parent, rank, root_u, root_v)
+
+    return mst
+
+# Driver Code
+graph = {
+    '1': [('5', 5), ('2', 10)],
+    '2': [('1', 10), ('3', 1), ('4', 6)],
+    '3': [('2', 1), ('4', 2), ('5', 7)],
+    '4': [('5', 3), ('2', 6), ('3', 2)],
+    '5': [('1', 5), ('3', 7), ('4', 3)]
+}
+minimum_spanning_tree = kruskal(graph)
+
+#Calculate weight of MST
+weight = sum(x[2] for x in minimum_spanning_tree)
+print("Weight of MST = ", weight)
+
+print("Edges of MST : ")
+for edge in minimum_spanning_tree:
+    print(edge)
+
+
+"""
+Output:-
+
+Weight of MST =  11
+Edges of MST : 
+('2', '3', 1)
+('3', '4', 2)
+('4', '5', 3)
+('1', '5', 5)
+
+--------------------------------------------------
+
+APPLICATIONS of Kruskal's Algorithm:
+
+Minimum Spanning Tree: Kruskal's algorithm is specifically designed to find the minimum spanning tree (MST) of a weighted undirected graph. It is commonly used in network design, transportation planning, and other scenarios where finding the minimum cost connectivity is essential.
+
+Network Clustering: Kruskal's algorithm can be applied to cluster data points based on their pairwise distances. By treating the data points as vertices and the distances as edge weights, the algorithm can identify the most significant connections between data points, leading to effective clustering.
+
+Image Segmentation: Kruskal's algorithm can be utilized in image segmentation tasks, where the goal is to partition an image into distinct regions based on certain criteria.
+
+--------------------------------------------------
+
+TIME COMPLEXITY of Kruskal's Algorithm:
+
+The time complexity of Kruskal's algorithm depends on the sorting step and the union-find operations performed on the edges of the graph.
+
+Sorting Step: The algorithm sorts the edges of the graph based on their weights, which takes O(E log E) time, where E is the number of edges in the graph. Sorting the edges dominates the time complexity of the algorithm.
+
+Union-Find Operations: The algorithm performs union-find operations on the vertices to check for cycles and merge sets. These operations typically take O(log V) time, where V is the number of vertices. Since the number of edges (E) is generally much larger than the number of vertices (V) in a graph, the union-find operations have a relatively smaller impact on the overall time complexity.
+
+Therefore, the time complexity of Kruskal's algorithm is O(E log E) due to the sorting step, where E is the number of edges in the graph.
+
+____________________________________________________________________________________________________________________________________________________________________
+"""
+
+
+======================= Weighted Interval Scheduling =========================
+
+def wis(requests):
+    requests.sort(key=lambda x: x[1]) #sort the request based on their finish time
+
+    N = len(requests)
+    dp = [0] * (N + 1) # list will be used for dynamic programming to store intermediate results with all intialized to 0 of size n
+
+    for i in range(1, N + 1):# iterate i from 1 to n(here 6)
+        j = i - 1
+        while j >= 0 and requests[j][1] > requests[i-1][0]: # while finish time of jth request is greater than start time of current request
+            dp[i] = max(requests[i-1][2] + dp[j], dp[i-1]) # update the dp
+            j -= 1
+    return dp[N]
+
+
+# requests are of the form (start_time, finish_time, value)
+requests = [
+    (1, 2, 100),
+    (2, 5, 200),
+    (3, 6, 300),
+    (4, 8, 400),
+    (5, 9, 500),
+    (6, 10, 100)
+    ]
+max_profit = wis(requests)
+print(f"Maximum profit: {max_profit}")
+
+
+"""
+-------------------------------------
+
+Output:-
+Maximum profit: 800
+
+-------------------------------------
+Applications:
+
+Job Scheduling: In job scheduling scenarios, such as in a computing cluster or server farm, weighted interval scheduling can be used to allocate resources efficiently. Each job represents an interval with a weight indicating its priority or significance. By selecting a subset of non-overlapping jobs with high weights, system administrators can prioritize critical tasks and optimize resource utilization.
+
+Resource Allocation: Weighted interval scheduling can also be applied to allocate limited resources, such as meeting rooms, vehicles, or equipment, among different users or groups. By assigning weights to the intervals representing resource requests, the scheduling algorithm can optimize resource usage and satisfy high-priority requests.
+
+-------------------------------------
+
+Time Complexity:
+The time complexity is O(nlogn) for all the cases.
+The overall time complexity of the algorithm can be analyzed as follows:
+
+Sorting: O(n log n)
+Dynamic programming loop: For each i iteration (from 1 to n), the nested while loop can iterate up to i times. Since the nested loop iterates up to n times in total, the time complexity of the nested loop is O(n).
+Hence, the overall time complexity of the algorithm is O(n log n) + O(n), which can be simplified to O(n log n) since the sorting dominates the overall time complexity.
+__________________________________________________________________________________________________________________________________________________________________
+
+"""
+
+
+======================= Knapsack =========================
+
+def knapsack(weight, value, W, N):
+    # 2-D array to store the intermediate values
+    dp = [[0 for _ in range(W+1)] for _ in range(N+1)]
+
+    # weight and value list have 0-based indexing
+    # dp has one based indexing
+    # therefore we subtract 1 to access the indexes of weight and value
+
+    for i in range(1, N+1):
+        for w in range(1, W+1):
+            if(weight[i-1] > w):
+                dp[i][w] = dp[i-1][w]
+            else :
+                dp[i][w] = max(dp[i-1][w] , dp[i-1][w - weight[i-1]] + value[i-1])
+
+    # Now let's find the items chosen for the knapsack
+    i = N
+    j = W
+    indOfItems = []
+
+    while i>0 and j>0:
+        if dp[i][j] != dp[i-1][j]:
+            # This item was selected
+            indOfItems.append(i-1)
+            j = j - weight[i-1]
+        i -= 1
+        
+    return dp[N][W], indOfItems
+
+
+if __name__ == "__main__":
+    weight = [3, 5, 6, 2]
+    value = [10, 4, 9, 11]
+    W = 7
+    N = 4
+
+    maxProfit, sol = knapsack(weight, value, W, N)
+
+    # Printing out the solution
+    print("The max profit = ", maxProfit)
+    print("Items included: ")
+    print("Weight \t Value")
+    for i in sol:
+        print(f"{weight[i]} \t {value[i]}")
+
+
+"""
+Output:
+
+The max profit =  21
+Items included: 
+Weight 	 Value
+2 	 11
+3 	 10
+"""
+
+"""
+TC : O(N*W)
+SC : O(N*W)
+"""
+
+
+======================= Bellman Ford =========================
+
+def bellmanFord(edgeList, V):
+    # Setting the distances of all nodes to infinity
+    dist = [1e9] * V
+
+    # Setting the distance of node 'a' to zero
+    dist[0] = 0
+
+    # Running the loop for (V-1) times
+    for i in range(V-1):
+        for edge in edgeList:
+            # Edge of the form
+            # from_node --> to_node
+            (from_node, to_node, weight) = edge
+
+            # Converting alphabets to integers for using as index in list
+            u = ord(from_node) - 97
+            v = ord(to_node) - 97
+            dist[v] = min(dist[v], dist[u]+weight )
+
+    return dist
+
+if __name__ == "__main__":
+    # An edge list containing all the edges in the form: (from, to, weight)
+    edgeList = [('a','b',-4), ('a','f',-3), ('b','d',-1), ('b','e',-2), ('c','b',8), ('c','f',3), ('d','a',6), ('d','f',4), ('e','c',-3), ('e','f',2)]
+    
+    # No. of vertices in the graph
+    V = 6
+
+    # Function call
+    dist = bellmanFord(edgeList, V)
+
+    # To store the characters according to index
+    temp = "abcdef"
+
+    print("Distances from a: ")
+    for i in range(V):
+        print(f"{temp[i]} : {dist[i]}")
+        
+
+"""
+Output :
+
+Distances from a: 
+a : 0
+b : -4
+c : -9
+d : -5
+e : -6
+f : -6
+"""
+
+"""
+Time Complexity : O(V * E)
+V -> no. of nodes
+E -> no. of edges
+"""
+
+
+======================= N-Queens =========================
+
+# Print the board
+def print_board(board, n):
+	for i in range(n):
+		for j in range(n):
+			print(board[i][j], end = " ")
+		print()
+
+# Joining '.' and 'Q'
+# making combined 2D Array
+# For output in desired format
+def add_sol(board, ans, n):               # converts my soln board from a 2-d array to a list of strings and adds it to ans 
+	temp = []
+	for i in range(n):
+		string = ""
+		for j in range(n):
+			string += board[i][j]
+		temp.append(string)               # temp here is a list of strings where each string represents a row in the board to be added to ans
+	ans.append(temp)                      # ans is a list of temps where each temp represents a solution board
+	
+	
+# We need to check in three directions
+# 1. in the same column above the current position
+# 2. in the left top diagonal from the given cell
+# 3. in the right top diagonal from the given cell
+def is_safe(row, col, board, n):
+	x = row
+	y = col
+	
+	# Check for same upper col
+	while(x>=0):
+		if board[x][y] == "Q":
+			return False
+		else:
+			x -= 1
+			
+	# Check for Upper Right Diagonal
+	x = row
+	y = col
+	while(y<n and x>=0):
+		if board[x][y] == "Q":
+			return False
+		else:
+			y += 1
+			x -= 1
+			
+	# Check for Upper Left diagonal
+	x = row
+	y = col
+	while(y>=0 and x>=0):
+		if board[x][y] == "Q":
+			return False
+		else:
+			x -= 1
+			y -= 1
+	return True
+
+
+# Function to solve n queens
+# solveNQueens function here will fill the queens
+# 1. there can be only one queen in one row
+# 2. if we filled the final row in the board then row will
+# be equal to total number of rows in board
+# 3. push that board configuration in answer set because
+# there will be more than one answers for filling the board
+# with n-queens
+def solveNQueens(row, ans, board, n):
+	
+	# Base Case
+	# Queen is depicted by "Q"
+	# adding solution to final answer array
+	if row == n:
+		add_sol(board, ans, n)
+		return
+	
+	# Solve 1 case and rest recursion will follow
+	for col in range(n):
+		
+		# For each position check if it is safe and if it
+		# is safe make a recursive call with
+		# row+1, board[i][j]='Q' and then revert the change
+		# in board that is make the board[i][j]='.' again to
+		# generate more solutions
+		if is_safe(row, col, board, n):
+			
+			# If placing Queen is safe
+			board[row][col] = "Q"
+			solveNQueens(row+1, ans, board, n)
+			
+			# Backtrack
+			board[row][col] = "."
+
+
+# Driver Code
+if __name__ == "__main__":
+	
+	# Size 4x4 is taken and we can pass some other
+	# dimension for chess board as well
+	n = 4
+	
+	# 2D array of string will make our board
+	# which is initially all empty
+	board = [["." for i in range(n)] for j in range(n)]
+	
+	# Store all the possible answers
+	ans = []
+	solveNQueens(0, ans, board, n)
+	
+	if ans == []:
+		print("Solution does not exist")
+	else:
+		print(len(ans))
+		for i in range(len(ans)):
+			print_board(ans[i], n)
+			print()
+		
+
+"""
+_________________________________________________________________________________
+Output:-
+2
+. Q . .
+. . . Q
+Q . . .
+. . Q .
+
+. . Q .
+Q . . .
+. . . Q
+. Q . .
+_________________________________________________________________________________
+TC : O(n!)
+"""
+
+
+
+======================= Travelling Salesman Problem =========================
+
+import math
+maxsize = float('inf')
+
+# Function to copy temporary solution
+# to the final solution
+def copyToFinal(curr_path):
+	final_path[:N + 1] = curr_path[:]
+	final_path[N] = curr_path[0]
+
+# Function to find the minimum edge cost
+# having an end at the vertex i
+def firstMin(adj, i):
+	min = maxsize
+	for k in range(N):
+		if adj[i][k] < min and i != k:
+			min = adj[i][k]
+
+	return min
+
+# function to find the second minimum edge
+# cost having an end at the vertex i
+def secondMin(adj, i):
+	first, second = maxsize, maxsize
+	for j in range(N):
+		if i == j:
+			continue
+		if adj[i][j] <= first:
+			second = first
+			first = adj[i][j]
+
+		elif(adj[i][j] <= second and
+			adj[i][j] != first):
+			second = adj[i][j]
+
+	return second
+
+# function that takes as arguments:
+# curr_bound -> lower bound of the root node
+# curr_weight-> stores the weight of the path so far
+# level-> current level while moving
+# in the search space tree
+# curr_path[] -> where the solution is being stored
+# which would later be copied to final_path[]
+def TSPRec(adj, curr_bound, curr_weight,
+			level, curr_path, visited):
+	global final_res
+	
+	# base case is when we have reached level N
+	# which means we have covered all the nodes once
+	if level == N:
+		
+		# check if there is an edge from
+		# last vertex in path back to the first vertex
+		if adj[curr_path[level - 1]][curr_path[0]] != 0:
+			
+			# curr_res has the total weight
+			# of the solution we got
+			curr_res = curr_weight + adj[curr_path[level - 1]]\
+										[curr_path[0]]
+			if curr_res < final_res:
+				copyToFinal(curr_path)
+				final_res = curr_res
+		return
+
+	# for any other level iterate for all vertices
+	# to build the search space tree recursively
+	for i in range(N):
+		
+		# Consider next vertex if it is not same
+		# (diagonal entry in adjacency matrix and
+		# not visited already)
+		if (adj[curr_path[level-1]][i] != 0 and
+							visited[i] == False):
+			temp = curr_bound
+			curr_weight += adj[curr_path[level - 1]][i]
+
+			# different computation of curr_bound
+			# for level 2 from the other levels
+			if level == 1:
+				curr_bound -= ((firstMin(adj, curr_path[level - 1]) +
+								firstMin(adj, i)) / 2)
+			else:
+				curr_bound -= ((secondMin(adj, curr_path[level - 1]) +
+								firstMin(adj, i)) / 2)
+
+			# curr_bound + curr_weight is the actual lower bound
+			# for the node that we have arrived on.
+			# If current lower bound < final_res,
+			# we need to explore the node further
+			if curr_bound + curr_weight < final_res:
+				curr_path[level] = i
+				visited[i] = True
+				
+				# call TSPRec for the next level
+				TSPRec(adj, curr_bound, curr_weight,
+					level + 1, curr_path, visited)
+
+			# Else we have to prune the node by resetting
+			# all changes to curr_weight and curr_bound
+			curr_weight -= adj[curr_path[level - 1]][i]
+			curr_bound = temp
+
+			# Also reset the visited array
+			visited = [False] * len(visited)
+			for j in range(level):
+				if curr_path[j] != -1:
+					visited[curr_path[j]] = True
+
+# This function sets up final_path
+def TSP(adj):
+	
+	# Calculate initial lower bound for the root node
+	# using the formula 1/2 * (sum of first min +
+	# second min) for all edges. Also initialize the
+	# curr_path and visited array
+	curr_bound = 0
+	curr_path = [-1] * (N + 1)
+	visited = [False] * N
+
+	# Compute initial bound
+	for i in range(N):
+		curr_bound += (firstMin(adj, i) +
+					secondMin(adj, i))
+
+	# Rounding off the lower bound to an integer
+	curr_bound = math.ceil(curr_bound / 2)
+
+	# We start at vertex 1 so the first vertex
+	# in curr_path[] is 0
+	visited[0] = True
+	curr_path[0] = 0
+
+	# Call to TSPRec for curr_weight
+	# equal to 0 and level 1
+	TSPRec(adj, curr_bound, 0, 1, curr_path, visited)
+
+
+# -------------------------------------------------------------------------------
+# Driver code
+# -------------------------------------------------------------------------------
+
+# Adjacency matrix for the given graph
+adj = [[0, 2, 0, 12, 5],
+	[2, 0, 4, 8, 0],
+	[0, 4, 0, 3, 3],
+	[12, 8, 3, 0, 10],
+	[5, 0, 3, 10, 0]]
+N = 5
+
+# final_path[] stores the final solution
+# i.e. the // path of the salesman.
+final_path = [None] * (N + 1)
+
+# visited[] keeps track of the already
+# visited nodes in a particular path
+visited = [False] * N
+
+# Stores the final minimum weight
+# of shortest tour.
+final_res = maxsize
+
+# Function call
+TSP(adj)
+
+# Printing the solution
+print("Minimum cost :", final_res)
+print("Path Taken : ", end = ' ')
+for i in range(N + 1):
+    node = chr(65 + final_path[i])
+    print(node, end=' ')
+
+
+"""
+Output:- 
+
+Minimum cost : 21
+Path Taken :  A B D C E A
+
+"""
+
+"""
+TC: Depends on the bounding function, but in worst case in equal to O(n!)
+
+Reference link : http://lcm.csa.iisc.ernet.in/dsa/node187.html
+"""
